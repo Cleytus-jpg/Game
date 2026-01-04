@@ -8,11 +8,28 @@ class Game2048 {
         this.bestScore = localStorage.getItem('bestScore') || 0;
         this.gameWon = false;
         this.gameOver = false;
+        this.imageCache = {}; // Cache for tile image existence
         
         this.initGrid();
+        this.preloadImages();
         this.setupUI();
         this.setupControls();
         this.startGame();
+    }
+
+    preloadImages() {
+        // Preload and cache tile images
+        const tileValues = [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048];
+        tileValues.forEach(value => {
+            const img = new Image();
+            img.src = `images/tile-${value}.png`;
+            img.onload = () => {
+                this.imageCache[value] = true;
+            };
+            img.onerror = () => {
+                this.imageCache[value] = false;
+            };
+        });
     }
 
     initGrid() {
@@ -138,19 +155,20 @@ class Game2048 {
     }
 
     mergeLine(line, reverse) {
-        if (reverse) line.reverse();
+        // Create a copy to avoid mutating the input array
+        const lineCopy = reverse ? [...line].reverse() : [...line];
         
         const merged = [];
         let i = 0;
         
-        while (i < line.length) {
-            if (i < line.length - 1 && line[i] === line[i + 1]) {
-                const newValue = line[i] * 2;
+        while (i < lineCopy.length) {
+            if (i < lineCopy.length - 1 && lineCopy[i] === lineCopy[i + 1]) {
+                const newValue = lineCopy[i] * 2;
                 merged.push(newValue);
                 this.score += newValue;
                 i += 2;
             } else {
-                merged.push(line[i]);
+                merged.push(lineCopy[i]);
                 i++;
             }
         }
@@ -180,21 +198,13 @@ class Game2048 {
                     tile.style.width = `${cellSize}px`;
                     tile.style.height = `${cellSize}px`;
                     
-                    // Check if custom image exists for this tile
-                    const img = new Image();
-                    img.src = `images/tile-${value}.png`;
-                    img.onerror = () => {
-                        // If image doesn't exist, show number
-                        tile.innerHTML = `<span class="tile-number">${value}</span>`;
-                    };
-                    img.onload = () => {
-                        // If image exists, use it as background
+                    // Use cached image existence check
+                    if (this.imageCache[value] === true) {
                         tile.style.backgroundImage = `url('images/tile-${value}.png')`;
                         tile.classList.add('has-image');
-                    };
-                    
-                    // Show number by default until image loads or fails
-                    tile.innerHTML = `<span class="tile-number">${value}</span>`;
+                    } else {
+                        tile.innerHTML = `<span class="tile-number">${value}</span>`;
+                    }
                     
                     gridContainer.appendChild(tile);
                 }
