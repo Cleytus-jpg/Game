@@ -361,13 +361,16 @@ class MusicPlayer {
             playPauseBtn.textContent = '▶';
             this.isPlaying = false;
         } else {
-            this.audio.play().catch(() => {
-                console.log('Audio file not found - this is expected for demo');
-                alert('Music files not found. Add MP3 files to the "music" folder:\n' +
-                      'track1.mp3, track2.mp3, track3.mp3, track4.mp3, track5.mp3');
-            });
-            playPauseBtn.textContent = '⏸';
-            this.isPlaying = true;
+            this.audio.play()
+                .then(() => {
+                    playPauseBtn.textContent = '⏸';
+                    this.isPlaying = true;
+                })
+                .catch(() => {
+                    console.log('Audio file not found - this is expected for demo');
+                    alert('Music files not found. Add MP3 files to the "music" folder:\n' +
+                          'track1.mp3, track2.mp3, track3.mp3, track4.mp3, track5.mp3');
+                });
         }
     }
 
