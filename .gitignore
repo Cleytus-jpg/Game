@@ -1,0 +1,28 @@
+# Music files (can be large)
+music/*.mp3
+music/*.wav
+music/*.ogg
+music/*.m4a
+
+# Keep the README
+!music/README.md
+
+# Image files
+images/*.png
+images/*.jpg
+images/*.jpeg
+images/*.gif
+
+# Keep the README
+!images/README.md
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
